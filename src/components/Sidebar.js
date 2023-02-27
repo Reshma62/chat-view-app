@@ -4,6 +4,7 @@ import Icons from "./Icons";
 import { AiOutlineHome, AiFillMessage, AiFillSetting } from "react-icons/ai";
 import { MdOutlineNotifications } from "react-icons/md";
 import { SlLogout } from "react-icons/sl";
+import { Link } from "react-router-dom";
 const Sidebar = ({active}) => {
   return (
     <div className="bg-[#5F35F5] h-screen rounded-xl">
@@ -15,7 +16,7 @@ const Sidebar = ({active}) => {
           </h2>
         </Flex>
         <Flex className=" flex-col h-full gap-y-8">
-          <div className=" text-primary relative z-10 ml-9 py-4">
+          <Link to={`/`} className=" text-primary relative z-10 ml-9 py-4">
             <AiOutlineHome
               className={`${
                 active == "home" ? "text-[#5F35F5]" : "text-[#BAD1FF]"
@@ -27,8 +28,11 @@ const Sidebar = ({active}) => {
               } w-full h-full top-0 left-0 -z-10 rounded-tl-lg rounded-bl-lg`}
             ></div>
             <div className="absolute bg-[#5F35F5] w-[8px] h-full right-0 top-0 -z-10 rounded-tl-lg rounded-bl-lg"></div>
-          </div>
-          <div className=" text-primary relative z-10 ml-9 py-4">
+          </Link>
+          <Link
+            to={`/message`}
+            className=" text-primary relative z-10 ml-9 py-4"
+          >
             <AiFillMessage
               className={`${
                 active == "message" ? "text-[#5F35F5]" : "text-[#BAD1FF]"
@@ -40,8 +44,11 @@ const Sidebar = ({active}) => {
               } w-full h-full top-0 left-0 -z-10 rounded-tl-lg rounded-bl-lg`}
             ></div>
             <div className="absolute bg-[#5F35F5] w-[8px] h-full right-0 top-0 -z-10 rounded-tl-lg rounded-bl-lg"></div>
-          </div>
-          <div className=" text-primary relative z-10 ml-9 py-4">
+          </Link>
+          <Link
+            to={`/notification`}
+            className=" text-primary relative z-10 ml-9 py-4"
+          >
             <MdOutlineNotifications
               className={`${
                 active == "notification" ? "text-[#5F35F5]" : "text-[#BAD1FF]"
@@ -53,8 +60,11 @@ const Sidebar = ({active}) => {
               } w-full h-full top-0 left-0 -z-10 rounded-tl-lg rounded-bl-lg`}
             ></div>
             <div className="absolute bg-[#5F35F5] w-[8px] h-full right-0 top-0 -z-10 rounded-tl-lg rounded-bl-lg"></div>
-          </div>
-          <div className=" text-primary relative z-10 ml-9 py-4">
+          </Link>
+          <Link
+            to={`/settings`}
+            className=" text-primary relative z-10 ml-9 py-4"
+          >
             <AiFillSetting
               className={`${
                 active == "settings" ? "text-[#5F35F5]" : "text-[#BAD1FF]"
@@ -66,8 +76,8 @@ const Sidebar = ({active}) => {
               } w-full h-full top-0 left-0 -z-10 rounded-tl-lg rounded-bl-lg`}
             ></div>
             <div className="absolute bg-[#5F35F5] w-[8px] h-full right-0 top-0 -z-10 rounded-tl-lg rounded-bl-lg"></div>
-          </div>
-          <div className=" text-primary relative z-10 ml-9 py-4 mt-auto">
+          </Link>
+          <Link className=" text-primary relative z-10 ml-9 py-4 mt-auto">
             <SlLogout
               className={`${
                 active == "settings" ? "text-[#5F35F5]" : "text-[#BAD1FF]"
@@ -79,7 +89,7 @@ const Sidebar = ({active}) => {
               } w-full h-full top-0 left-0 -z-10 rounded-tl-lg rounded-bl-lg`}
             ></div>
             <div className="absolute bg-[#5F35F5] w-[8px] h-full right-0 top-0 -z-10 rounded-tl-lg rounded-bl-lg"></div>
-          </div>
+          </Link>
         </Flex>
       </div>
     </div>
