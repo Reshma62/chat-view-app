@@ -79,14 +79,12 @@ const Sidebar = ({active}) => {
           </Link>
           <Link className=" text-primary relative z-10 ml-9 py-4 mt-auto">
             <SlLogout
-              className={`${
-                active == "settings" ? "text-[#5F35F5]" : "text-[#BAD1FF]"
-              } mx-auto text-5xl`}
+              className={` text-[#BAD1FF]
+               mx-auto text-5xl`}
             />
             <div
-              className={`absolute ${
-                active == "settings" ? "bg-white" : "bg-transparent"
-              } w-full h-full top-0 left-0 -z-10 rounded-tl-lg rounded-bl-lg`}
+              className={`absolute  bg-transparent
+               w-full h-full top-0 left-0 -z-10 rounded-tl-lg rounded-bl-lg`}
             ></div>
             <div className="absolute bg-[#5F35F5] w-[8px] h-full right-0 top-0 -z-10 rounded-tl-lg rounded-bl-lg"></div>
           </Link>
