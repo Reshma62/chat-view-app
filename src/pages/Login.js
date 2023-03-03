@@ -1,12 +1,22 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import Flex from "../components/Flex";
 import InputBox from "../components/InputBox";
-
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { userLoginInfo } from "../slices/userSlices";
+import { useDispatch } from "react-redux";
+import { FallingLines } from "react-loader-spinner";
 const Login = () => {
+  const auth = getAuth();
+  let navigate = useNavigate();
+  let dispatch = useDispatch();
+ 
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [emailerror, setEmailerror] = useState("");
   const [passerror, setPasserror] = useState("");
+  const [loading, setLoading] = useState(false);
 
   let handleEmail = (e) => {
     setEmail(e.target.value);
@@ -39,9 +49,40 @@ const Login = () => {
     } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       setEmailerror("Email is not valid");
     }
+
+    if (email && pass) {
+      setLoading(true);
+      signInWithEmailAndPassword(auth, email, pass)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+
+          setEmail("");
+          setPass("");
+          dispatch(userLoginInfo(user));
+          localStorage.setItem("allUserLoginInfo", JSON.stringify(user));
+          toast.success("Login SuccessFull. Please wait for redriction");
+          setTimeout(() => {
+            navigate("/");
+          }, 2000);
+          setLoading(false);
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          console.log(errorMessage);
+          if (errorMessage.includes("auth/user-not-found")) {
+            setEmailerror("Email is wrong");
+          }
+          if (errorMessage.includes("auth/wrong-password")) {
+            setPasserror("Password is wrong");
+          }
+          setLoading(false);
+        });
+    }
   };
   return (
     <div className="max-h-screen w-full">
+      <ToastContainer position="bottom-center" />
       <Flex className={` items-center justify-center h-screen`}>
         <Flex className="w-1/2 flex-col items-center">
           <div>
@@ -79,16 +120,32 @@ const Login = () => {
                   {passerror}
                 </p>
               )}
-
-              <button
-                onClick={handleSubmit}
-                className="bg-primary text-white w-full rounded-full py-6 font-nunito font-semibold text-xl"
-              >
-                Login to Continue
-              </button>
+              {loading ? (
+                <div className="bg-primary  md:w-96 w-full rounded-full flex justify-center">
+                  <FallingLines
+                    color="#fff"
+                    width="70"
+                    visible={true}
+                    ariaLabel="falling-lines-loading"
+                  />
+                </div>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  className="bg-primary text-white w-full rounded-full py-6 font-nunito font-semibold text-xl"
+                >
+                  Login to Continue
+                </button>
+              )}
               <p className="font-nunito font-normal text-xl text-center mt-9">
                 Don't have an account ?
-                <span className=" font-bold  text-[#EA6C00]"> Sign up</span>{" "}
+                <Link
+                  to={"/registation"}
+                  className=" font-bold  text-[#EA6C00]"
+                >
+                  {" "}
+                  Sign up
+                </Link>{" "}
               </p>
             </div>
           </div>

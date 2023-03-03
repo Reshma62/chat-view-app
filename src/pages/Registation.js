@@ -1,14 +1,30 @@
 import React, { useState } from "react";
 import Flex from "../components/Flex";
 import InputBox from "../components/InputBox";
-
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+} from "firebase/auth";
+import { getDatabase, ref, set } from "firebase/database";
+import { ToastContainer, toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+import { userLoginInfo } from "../slices/userSlices";
+import { useDispatch } from "react-redux";
+import { FallingLines } from "react-loader-spinner";
 const Registation = () => {
+  const auth = getAuth();
+  let navigate = useNavigate();
+  let dispatch = useDispatch();
+  const db = getDatabase();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [emailerror, setEmailerror] = useState("");
   const [passerror, setPasserror] = useState("");
   const [fullNameerror, setFullNameerror] = useState("");
+  const [loading, setLoading] = useState(false);
 
   let handleFullName = (e) => {
     setFullName(e.target.value);
@@ -48,10 +64,60 @@ const Registation = () => {
     } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       setEmailerror("Email is not valid");
     }
+    if (fullName && email && pass) {
+      setLoading(true);
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          // ...
+          updateProfile(auth.currentUser, {
+            displayName: fullName,
+            photoURL: "assets/default.png",
+          })
+            .then(() => {
+              toast.success(
+                "Registation SuccessFull. Please veryfi your Email"
+              );
+              sendEmailVerification(auth.currentUser);
+              setFullName("");
+              setEmail("");
+              setPass("");
+              // dispatch( userLoginInfo( user ) );
+              // localStorage.setItem("allUserLoginInfo", JSON.stringify(user))
+
+              setTimeout(() => {
+                navigate("/login");
+              }, 2000);
+              setLoading(false);
+            })
+            .then(() => {
+              set(ref(db, "users/" + user.uid), {
+                username: user.displayName,
+                email: user.email,
+                profile_picture: user.photoURL,
+              });
+            })
+            .catch((error) => {
+              // An error occurred
+              // ...
+            });
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          console.log(errorMessage);
+          if (errorMessage.includes("auth/email-already-in-use")) {
+            setEmailerror("Email already in use");
+          }
+          setLoading(false);
+          // ..
+        });
+    }
   };
 
   return (
     <div className="max-h-screen w-full">
+      <ToastContainer position="bottom-center" />
       <Flex className={` items-center justify-center h-screen`}>
         <Flex className="w-1/2 flex-col items-center">
           <div>
@@ -94,16 +160,28 @@ const Registation = () => {
                   {passerror}
                 </p>
               )}
-
-              <button
-                onClick={handleSubmit}
-                className="bg-primary text-white w-full rounded-full py-6 font-nunito font-semibold text-xl"
-              >
-                Sign Up
-              </button>
+              {loading ? (
+                <div className="bg-primary  md:w-96 w-full rounded-full flex justify-center">
+                  <FallingLines
+                    color="#fff"
+                    width="70"
+                    visible={true}
+                    ariaLabel="falling-lines-loading"
+                  />
+                </div>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  className="bg-primary text-white w-full rounded-full py-6 font-nunito font-semibold text-xl"
+                >
+                  Sign Up
+                </button>
+              )}
               <p className="font-nunito font-normal text-xl text-center mt-9">
                 Already have an account ?{" "}
-                <span className=" font-bold  text-[#EA6C00]">Sign In</span>{" "}
+                <Link to={"/login"} className=" font-bold  text-[#EA6C00]">
+                  Sign In
+                </Link>{" "}
               </p>
             </div>
           </div>
