@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import BlockUser from "../components/BlockUser";
 import Flex from "../components/Flex";
@@ -10,12 +10,12 @@ import MyGroups from "../components/MyGroups";
 import Search from "../components/Search";
 import Sidebar from "../components/Sidebar";
 import UserList from "../components/UserList";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { userLoginInfo } from "../slices/userSlices";
 const Home = () => {
   const auth = getAuth();
-  let [verify, setVerify] = useState(true);
-  const usersin = auth.currentUser;
-  console.log(usersin);
+  let [verify, setVerify] = useState(false);
+ let dispatch = useDispatch();
   let data = useSelector((state) => state.alluserLoginInfo.userInfo);
   let navigate = useNavigate();
   // console.log(data);
@@ -26,7 +26,18 @@ const Home = () => {
     /* if (usersin) {
       setVerify(true);
     } */
-  }, []);
+  }, [] );
+  onAuthStateChanged(auth, (user) => {
+    if (user.emailVerified) {
+setVerify(true);
+    dispatch(userLoginInfo(user));
+    localStorage.setItem("allUserLoginInfo", JSON.stringify(user));
+    } else {
+      // User is signed out
+      // ...
+    }
+  });
+
 
   return (
     <>
