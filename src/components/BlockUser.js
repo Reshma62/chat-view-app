@@ -31,6 +31,19 @@ const BlockUser = () => {
       setBlockList(arr);
     });
   }, []);
+  let handleUnblock = (item) => {
+    console.log(item);
+    set(push(ref(db, "friends")), {
+      profile_picture: item.blockPic,
+      receiverId: item.blockId,
+      receiverName: item.blockName,
+      senderId: item.whoBlockId,
+      senderName: item.whoBlockName,
+      senderProfilePic: item.whoBlockPic,
+    }).then(() => {
+      remove(ref(db, "block/" + item.blockListId));
+    });
+  };
   return (
     <div className="mt-10 h-[425px] shadow-xl p-6 rounded-2xl bg-white overflow-y-scroll">
       <Headings heding="Block User" />
@@ -46,10 +59,12 @@ const BlockUser = () => {
             }
             others="Hi Guys, Wassup!"
             imgHere={
-              item.whoBlockId == data.uid ?item.whoBlockPic  :item.blockPic
+              item.whoBlockId == data.uid ? item.whoBlockPic : item.blockPic
             }
           >
-            {item.whoBlockId == data.uid && <Button Text={"Unblock"} />}
+            {item.whoBlockId == data.uid && (
+              <Button Text={"Unblock"} onClick={() => handleUnblock(item)} />
+            )}
           </FriendsPattren>
         ))
       )}
