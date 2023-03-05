@@ -50,6 +50,29 @@ const UserList = () => {
       setFriendReqList(arr);
     });
   }, []);
+  const [friendsList, setFriendsList] = useState([]);
+  useEffect(() => {
+    const friendsRef = ref(db, "friends");
+    onValue(friendsRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        // console.log(item.val());
+        arr.push(item.val().receiverId + item.val().senderId);
+      });
+      setFriendsList(arr);
+    });
+  }, []);
+  const [blockList, setBlockList] = useState([]);
+  useEffect(() => {
+    const blockRef = ref(db, "block");
+    onValue(blockRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push(item.val().whoBlockId + item.val().blockId);
+      });
+      setBlockList(arr);
+    });
+  }, []);
   return (
     <div className="mt-10 h-[472px] shadow-xl p-6 rounded-2xl bg-white overflow-y-scroll">
       <Headings heding="User List" />
@@ -60,12 +83,15 @@ const UserList = () => {
           imgHere={item.profile_picture}
         >
           <div className="flex">
-            {friendReqList.includes(data.uid + item.userId) ||
-            friendReqList.includes(item.userId + data.uid) ? (
-              <Button
-                Text={"Pending"}
-                
-              />
+            { blockList.includes(data.uid + item.userId)||
+             blockList.includes(item.userId + data.uid)? (
+              <Button Text={"Block"} />
+            ) : friendsList.includes(item.userId + data.uid) ||
+              friendsList.includes(data.uid + item.userId) ? (
+              <Button Text={"Friend"} />
+            ) : friendReqList.includes(data.uid + item.userId) ||
+              friendReqList.includes(item.userId + data.uid) ? (
+              <Button Text={"Pending"} />
             ) : (
               <Button
                 Text={"Add Friend"}
