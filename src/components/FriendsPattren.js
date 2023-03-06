@@ -1,5 +1,4 @@
 import React from 'react'
-import Button from './Button';
 import Flex from './Flex';
 
 const FriendsPattren = ({ names, others, imgHere, children }) => {

@@ -85,7 +85,7 @@ const UserList = () => {
           <div className="flex">
             { blockList.includes(data.uid + item.userId)||
              blockList.includes(item.userId + data.uid)? (
-              <Button Text={"Block"} />
+              <Button Text={"Block"} className="bg-red-500"/>
             ) : friendsList.includes(item.userId + data.uid) ||
               friendsList.includes(data.uid + item.userId) ? (
               <Button Text={"Friend"} />
