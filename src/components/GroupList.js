@@ -10,6 +10,7 @@ const GroupList = () => {
   let data = useSelector((state) => state.alluserLoginInfo.userInfo);
   const [show, setShow] = useState(false);
   const [groupList, setGroupList] = useState([]);
+  const [sendGrReq, setSendGrReq] = useState([]);
   const [groupName, setGroupName] = useState("");
   const [groupTag, setGroupTag] = useState("");
   const [groupNameErr, setGroupNameErr] = useState("");
@@ -60,13 +61,37 @@ const GroupList = () => {
       });
       setGroupList(arr);
     });
-  }, [] );
-
+  }, []);
+  let joinGroup = (item) => {
+    // console.log( item );
+    set(push(ref(db, "reqJoinGroup")), {
+      ...item,
+      userName: data.displayName,
+      userId: data.uid,
+      userPhoto: data.photoURL,
+    });
+  };
+  useEffect(() => {
+    const reqGroupRef = ref(db, "reqJoinGroup");
+    onValue(reqGroupRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push(item.val().groupId + item.val().userId);
+      });
+      setSendGrReq(arr);
+    });
+  }, []);
 
   return (
     <div className="mt-10 h-[400px] shadow-xl p-6 rounded-2xl bg-white relative overflow-y-scroll">
       <Headings heding="Groups List" onClick={openCreateGrp} />
-      {show && <Button Text={"Go Back"} className="absolute top-4 right-0" onClick={showOff} />}
+      {show && (
+        <Button
+          Text={"Go Back"}
+          className="absolute top-4 right-0"
+          onClick={showOff}
+        />
+      )}
 
       {show ? (
         <>
@@ -103,7 +128,12 @@ const GroupList = () => {
             others={`TagLine: ${item.groupTags} <p></p> Admin: ${item.whoCreateGrpName}`}
             imgHere={item.whoCreateGrpPic}
           >
-            <Button Text={"Join"} />
+            {sendGrReq.includes(data.uid + item.groupId) ||
+            sendGrReq.includes(item.groupId + data.uid) ? (
+              <Button Text={"Pending"} />
+            ) : (
+              <Button Text={"Join"} onClick={() => joinGroup(item)} />
+            )}
           </FriendsPattren>
         ))
       )}
