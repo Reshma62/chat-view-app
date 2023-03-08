@@ -81,6 +81,18 @@ const GroupList = () => {
       setSendGrReq(arr);
     });
   }, []);
+  const [accGroupReq, setAccGroupReq] = useState([]);
+  useEffect(() => {
+    const acceptGrReqRef = ref(db, "acceptGroupReq");
+    onValue(acceptGrReqRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        console.log("item", item.val());
+        arr.push(item.val().groupId + item.val().userId);
+      });
+      setAccGroupReq(arr);
+    });
+  }, []);
 
   return (
     <div className="mt-10 h-[400px] shadow-xl p-6 rounded-2xl bg-white relative overflow-y-scroll">
@@ -128,12 +140,16 @@ const GroupList = () => {
             others={`TagLine: ${item.groupTags} <p></p> Admin: ${item.whoCreateGrpName}`}
             imgHere={item.whoCreateGrpPic}
           >
-            {sendGrReq.includes(data.uid + item.groupId) ||
-            sendGrReq.includes(item.groupId + data.uid) ? (
+            {accGroupReq.includes(data.uid + item.groupId) ||
+            accGroupReq.includes(item.groupId + data.uid) ? (
+              <Button Text={"Member"} />
+            ) : sendGrReq.includes(data.uid + item.groupId) ||
+              sendGrReq.includes(item.groupId + data.uid) ? (
               <Button Text={"Pending"} />
             ) : (
               <Button Text={"Join"} onClick={() => joinGroup(item)} />
             )}
+            {}
           </FriendsPattren>
         ))
       )}
