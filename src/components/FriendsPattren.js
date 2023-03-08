@@ -1,9 +1,12 @@
 import React from 'react'
 import Flex from './Flex';
 
-const FriendsPattren = ({ names, others, imgHere, children }) => {
+const FriendsPattren = ({ names, others, imgHere, children, onClick }) => {
   return (
-    <div className="mb-5 border-b border-solid border-[#ddd] pb-3">
+    <div
+      onClick={onClick}
+      className="mb-5 border-b border-solid border-[#ddd] pb-3"
+    >
       <Flex className="gap-x-7 items-center">
         <div className="w-[80px] h-[80px]">
           <img src={imgHere} alt="" className="rounded-full" />

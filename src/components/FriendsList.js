@@ -10,11 +10,21 @@ import {
   push,
   remove,
 } from "firebase/database";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { activeUsersInfo } from "../slices/activeUsers";
 const FriendsList = () => {
   const [friendsList, setFriendsList] = useState([]);
   const db = getDatabase();
   let data = useSelector((state) => state.alluserLoginInfo.userInfo);
+  let dispatch = useDispatch();
+
+  /* const collectionRef = ref(db, "friends");
+  collectionRef.on("child_added", (snapshot) => {
+    // Get the new child ID
+    const childId = snapshot.key;
+    console.log(childId);
+  }); */
+
   useEffect(() => {
     const friendsRef = ref(db, "friends");
     onValue(friendsRef, (snapshot) => {
@@ -56,6 +66,48 @@ const FriendsList = () => {
       });
     }
   };
+
+  let sendMessage = (item) => {
+    console.log(item);
+    if (data.uid == item.receiverId) {
+      dispatch(
+        activeUsersInfo({
+          name: item.senderName,
+          id: item.senderId,
+          status: "single",
+          profilePhoto: item.profile_picture,
+        })
+      );
+      localStorage.setItem(
+        "activeChatUsers",
+        JSON.stringify({
+          name: item.senderName,
+          id: item.senderId,
+          status: "single",
+          profilePhoto: item.profile_picture,
+        })
+      );
+    } else {
+      dispatch(
+        activeUsersInfo({
+          name: item.receiverName,
+          id: item.receiverId,
+          status: "single",
+          profilePhoto: item.senderProfilePic,
+        })
+      );
+      localStorage.setItem(
+        "activeChatUsers",
+        JSON.stringify({
+          name: item.receiverName,
+          id: item.receiverId,
+          status: "single",
+          profilePhoto: item.senderProfilePic,
+        })
+      );
+    }
+  };
+
   return (
     <div className="mt-10 h-[472px] shadow-xl p-6 rounded-2xl bg-white overflow-y-scroll">
       <Headings heding="Friends" />
@@ -66,6 +118,7 @@ const FriendsList = () => {
       ) : (
         friendsList.map((item) => (
           <FriendsPattren
+            onClick={() => sendMessage(item)}
             names={
               data.uid == item.senderId ? item.receiverName : item.senderName
             }
