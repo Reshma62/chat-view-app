@@ -3,15 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Flex from "../components/Flex";
 import InputBox from "../components/InputBox";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { userLoginInfo } from "../slices/userSlices";
 import { useDispatch } from "react-redux";
 import { FallingLines } from "react-loader-spinner";
+import { getDatabase, ref, set, onValue, push } from "firebase/database";
 const Login = () => {
   const auth = getAuth();
   let navigate = useNavigate();
   let dispatch = useDispatch();
- 
+  const db = getDatabase();
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [emailerror, setEmailerror] = useState("");
@@ -80,6 +86,33 @@ const Login = () => {
         });
     }
   };
+  const provider = new GoogleAuthProvider();
+  let loginWithGoogle = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        const userRef = ref(db, "users/" + auth.currentUser.uid);
+        onValue(userRef, (snapshot) => {
+          const currentUser = snapshot.val();
+
+          if (currentUser.email === user.email) {
+            alert(
+              `You already have an account ${currentUser.email}. Please Login with Email and Password`
+            );
+            /* toast(
+              `You already have an account ${currentUser.email}. Please Login with Email and Password`
+            ); */
+          }
+          {
+            navigate("/");
+          }
+        });
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        console.log(error);
+      });
+  };
   return (
     <div className="max-h-screen w-full">
       <ToastContainer position="bottom-center" />
@@ -89,7 +122,10 @@ const Login = () => {
             <h2 className="text-primary font-nunito font-bold text-4xl">
               Login to your account!
             </h2>
-            <div className="flex items-center justify-center border-[#11175D]/[.3] border-solid border-2 gap-x-3 py-6 w-[300px] my-7 rounded-xl">
+            <div
+              onClick={loginWithGoogle}
+              className="flex items-center justify-center border-[#11175D]/[.3] border-solid border-2 gap-x-3 py-6 w-[300px] my-7 rounded-xl"
+            >
               <div>
                 <img src="assets/google.png" alt="" />
               </div>

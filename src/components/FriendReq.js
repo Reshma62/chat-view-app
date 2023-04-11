@@ -15,6 +15,8 @@ const FriendReq = () => {
   const db = getDatabase();
   const [friendReqList, setFriendReqList] = useState([]);
   let data = useSelector((state) => state.alluserLoginInfo.userInfo);
+  let profileData = useSelector((state) => state.alluserLoginInfo.getPhoto);
+  console.log(profileData);
   useEffect(() => {
     const friendReqSendRef = ref(db, "friendReqsend");
     onValue(friendReqSendRef, (snapshot) => {
@@ -31,7 +33,7 @@ const FriendReq = () => {
     console.log(item);
     set(push(ref(db, "friends")), {
       ...item,
-      senderProfilePic: data.photoURL,
+      senderProfilePic: profileData,
     }).then(() => {
       remove(ref(db, "friendReqsend/" + item.friendReqId));
     });

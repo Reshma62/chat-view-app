@@ -5,9 +5,8 @@ import { AiOutlineHome, AiFillMessage, AiFillSetting } from "react-icons/ai";
 import { MdOutlineNotifications, MdCloudUpload } from "react-icons/md";
 import { SlLogout } from "react-icons/sl";
 import { Link, useNavigate } from "react-router-dom";
-import { userLoginInfo } from "../slices/userSlices";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { userLoginInfo, userProfileUpdate } from "../slices/userSlices";
+import { useDispatch, useSelector } from "react-redux";
 import { getAuth, signOut, updateProfile } from "firebase/auth";
 import Cropper from "react-cropper";
 import { FallingLines } from "react-loader-spinner";
@@ -17,13 +16,18 @@ import {
   ref,
   uploadString,
   getDownloadURL,
-
 } from "firebase/storage";
-import { getDatabase, ref as databaseRef, child, push, update } from "firebase/database";
+import {
+  getDatabase,
+  ref as databaseRef,
+  child,
+  push,
+  update,
+} from "firebase/database";
 
 const Sidebar = ({ active }) => {
   const auth = getAuth();
-    const db = getDatabase();
+  const db = getDatabase();
   let navigate = useNavigate();
   let dispatch = useDispatch();
   const [modalShow, setModalShow] = useState(false);
@@ -37,6 +41,7 @@ const Sidebar = ({ active }) => {
     setModalShow(!modalShow);
   }
   let data = useSelector((state) => state.alluserLoginInfo.userInfo);
+
   let handleLogOut = () => {
     signOut(auth)
       .then(() => {
@@ -87,7 +92,8 @@ const Sidebar = ({ active }) => {
             update(databaseRef(db, "users/" + auth.currentUser.uid), {
               profile_picture: downloadURL,
             });
-            setModalShow(false)
+            dispatch(userProfileUpdate(downloadURL));
+            setModalShow(false);
           })
           .catch((error) => {
             // An error occurred

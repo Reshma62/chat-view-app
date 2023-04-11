@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import BlockUser from "../components/BlockUser";
 import Flex from "../components/Flex";
@@ -15,9 +15,10 @@ import { userLoginInfo } from "../slices/userSlices";
 const Home = () => {
   const auth = getAuth();
   let [verify, setVerify] = useState(false);
- let dispatch = useDispatch();
+  let dispatch = useDispatch();
   let data = useSelector((state) => state.alluserLoginInfo.userInfo);
   let navigate = useNavigate();
+  const [user, setUser] = useState(null);
   // console.log(data);
   useEffect(() => {
     if (!data) {
@@ -27,21 +28,29 @@ const Home = () => {
       setVerify(true);
     } */
   }, [] );
-  onAuthStateChanged(auth, (user) => {
-    if (user.emailVerified) {
-setVerify(true);
-    dispatch(userLoginInfo(user));
-    localStorage.setItem("allUserLoginInfo", JSON.stringify(user));
-    } else {
-      // User is signed out
-      // ...
-    }
-  });
+
+   useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+   }, []);
 
 
   return (
     <>
-      {verify ? (
+      {user && !user.emailVerified && (
+        <div className="flex w-full h-screen justify-center items-center bg-primary">
+          <h3 className="text-5xl bg-white text-primary text-center p-7  font-pop font-bold">
+            please verify your mail
+          </h3>
+        </div>
+      )}
+      {user && (
         <div className="p-6">
           <Flex className={`gap-x-5 justify-between`}>
             <div className="w-[10%]">
@@ -62,13 +71,7 @@ setVerify(true);
             </div>
           </Flex>
         </div>
-      ) : (
-        <div className="flex w-full h-screen justify-center items-center bg-primary">
-          <h3 className="text-5xl bg-white text-primary text-center p-7  font-pop font-bold">
-            please verify your mail
-          </h3>
-        </div>
-      )}
+      ) }
     </>
   );
 };
